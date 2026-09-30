@@ -25,6 +25,12 @@ function Icon({name}:{name:"search"|"bag"|"user"|"heart"|"menu"|"chev"}) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">{p[name]}</svg>;
 }
 
+function WhatsappIcon(){
+  return <svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
+    <path d="M16.02 5.2A10.7 10.7 0 0 0 6.8 21.34L5.2 26.8l5.6-1.48a10.72 10.72 0 1 0 5.22-20.12Zm0 19.5a8.73 8.73 0 0 1-4.46-1.22l-.32-.19-3.32.88.89-3.23-.2-.33A8.75 8.75 0 1 1 16.02 24.7Zm4.8-6.55c-.26-.13-1.56-.77-1.8-.86-.24-.09-.41-.13-.59.13-.17.26-.67.86-.82 1.04-.15.17-.3.2-.56.07-.26-.13-1.1-.41-2.1-1.3-.77-.69-1.3-1.54-1.45-1.8-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.33-.02-.46-.07-.13-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45h-.5c-.17 0-.46.07-.7.33-.24.26-.91.89-.91 2.17s.93 2.52 1.06 2.7c.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.56-.64 1.78-1.26.22-.62.22-1.15.15-1.26-.06-.11-.24-.17-.5-.3Z"/>
+  </svg>
+}
+
 function WineCard({wine}:{wine:(typeof wines)[number]}) {
   return <article className="wineCard">
     <div className="winePhoto">
@@ -53,12 +59,12 @@ export default function Home(){
     <header className="header">
       <div className="headerTop">
         <button className="menuBtn" onClick={()=>setMenu(!menu)}><Icon name="menu"/></button>
-        <a href="#" className="logo"><span className="logoMark">V</span><span>VIDEIRA</span></a>
+        <a href="/" className="logo"><span className="logoMark">V</span><span>VIDEIRA</span></a>
         <div className="searchBox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos"/></div>
         <div className="actions"><button><Icon name="user"/></button><button><Icon name="bag"/><span className="count">0</span></button></div>
       </div>
       <nav className={menu?"nav open":"nav"}>
-        <a href="#loja">Loja</a><a href="#vinhos">Vinhos</a><a href="#bodegas">Bodegas</a><a href="#uvas">Uvas</a><a href="#ofertas">Ofertas</a>
+        <a href="/loja">Loja</a><a href="#vinhos">Vinhos</a><a href="#bodegas">Bodegas</a><a href="#uvas">Uvas</a><a href="#ofertas">Ofertas</a>
       </nav>
     </header>
 
@@ -67,19 +73,19 @@ export default function Home(){
         <span className="pill">SELEÇÃO VIDEIRA</span>
         <h1>Encontre o vinho certo para cada momento.</h1>
         <p>Explore rótulos selecionados, compare estilos e encontre novas garrafas para descobrir.</p>
-        <a href="#vinhos" className="heroBtn">Explorar vinhos</a>
+        <a href="/loja" className="heroBtn">Explorar vinhos</a>
       </div>
       <div className="heroCard">
         <span>Escolha da casa</span><strong>Malbec argentino</strong><small>Frutado · intenso · elegante</small>
       </div>
     </section>
 
-    <section className="content" id="loja">
+    <section className="content">
       <h2>Compre vinhos bem avaliados</h2>
-      <div className="categoryRow">{categories.map(c=><button key={c}>{c}</button>)}</div>
+      <div className="categoryRow">{categories.map(c=><a href={`/loja?tipo=${encodeURIComponent(c)}`} key={c}>{c}</a>)}</div>
 
       <section className="shelf" id="ofertas">
-        <div className="shelfHead"><div><h2>Ofertas para você</h2><p>Ótimo custo-benefício em rótulos selecionados.</p></div><a href="#">Ver tudo <Icon name="chev"/></a></div>
+        <div className="shelfHead"><div><h2>Ofertas para você</h2><p>Ótimo custo-benefício em rótulos selecionados.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
         <div className="wineRail">{(query?filtered:wines).map(w=><WineCard key={w.name} wine={w}/>)}</div>
       </section>
 
@@ -90,17 +96,17 @@ export default function Home(){
       </section>
 
       <section className="shelf" id="vinhos">
-        <div className="shelfHead"><div><h2>Mais procurados</h2><p>Os rótulos que estão chamando mais atenção.</p></div><a href="#">Ver tudo <Icon name="chev"/></a></div>
+        <div className="shelfHead"><div><h2>Mais procurados</h2><p>Os rótulos que estão chamando mais atenção.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
         <div className="wineRail">{wines.slice().reverse().map(w=><WineCard key={w.name+"2"} wine={w}/>)}</div>
       </section>
 
       <section className="styles">
         <h2>Explore por estilo</h2>
         <div className="styleCards">
-          <a href="#"><strong>Tintos encorpados</strong><span>Cabernet · Malbec · Syrah</span></a>
-          <a href="#"><strong>Brancos frescos</strong><span>Sauvignon · Chardonnay</span></a>
-          <a href="#"><strong>Rosés leves</strong><span>Provence · Grenache</span></a>
-          <a href="#"><strong>Espumantes</strong><span>Brut · Extra Brut</span></a>
+          <a href="/loja?tipo=Tinto"><strong>Tintos encorpados</strong><span>Cabernet · Malbec · Syrah</span></a>
+          <a href="/loja?tipo=Branco"><strong>Brancos frescos</strong><span>Sauvignon · Chardonnay</span></a>
+          <a href="/loja?tipo=Rosé"><strong>Rosés leves</strong><span>Provence · Grenache</span></a>
+          <a href="/loja?tipo=Espumante"><strong>Espumantes</strong><span>Brut · Extra Brut</span></a>
         </div>
       </section>
 
@@ -112,10 +118,10 @@ export default function Home(){
 
     <footer>
       <div className="footerLogo"><span className="logoMark">V</span><b>VIDEIRA</b><p>Vinhos & curadoria</p></div>
-      <div><b>Comprar</b><a href="#vinhos">Vinhos</a><a href="#ofertas">Ofertas</a><a href="#bodegas">Bodegas</a></div>
+      <div><b>Comprar</b><a href="/loja">Vinhos</a><a href="/loja">Ofertas</a><a href="/loja">Bodegas</a></div>
       <div><b>Ajuda</b><a href="#">WhatsApp</a><a href="#">Instagram</a><a href="#">Entrega</a></div>
       <small>© 2026 Videira · Venda proibida para menores de 18 anos.</small>
     </footer>
-    <a className="whatsapp" href="https://wa.me/" aria-label="WhatsApp">WA</a>
+    <a className="whatsapp" href="https://wa.me/" aria-label="WhatsApp"><WhatsappIcon/></a>
   </main>
 }
