@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";\nimport CartButton from "@/components/CartButton";\nimport { addToCart } from "@/lib/cart";
 
 const wines = [
@@ -20,10 +20,12 @@ function Heart(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 function WhatsappIcon(){return <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.02 5.2A10.7 10.7 0 0 0 6.8 21.34L5.2 26.8l5.6-1.48a10.72 10.72 0 1 0 5.22-20.12Zm0 19.5a8.73 8.73 0 0 1-4.46-1.22l-.32-.19-3.32.88.89-3.23-.2-.33A8.75 8.75 0 1 1 16.02 24.7Zm4.8-6.55c-.26-.13-1.56-.77-1.8-.86-.24-.09-.41-.13-.59.13-.17.26-.67.86-.82 1.04-.15.17-.3.2-.56.07-.26-.13-1.1-.41-2.1-1.3-.77-.69-1.3-1.54-1.45-1.8-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.33-.02-.46-.07-.13-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45h-.5c-.17 0-.46.07-.7.33-.24.26-.91.89-.91 2.17s.93 2.52 1.06 2.7c.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.56-.64 1.78-1.26.22-.62.22-1.15.15-1.26-.06-.11-.24-.17-.5-.3Z"/></svg>}
 
 export default function Loja(){
-  const params = useSearchParams();
-  const initialType = params.get("tipo") || "Todos";
   const [query,setQuery]=useState("");
-  const [type,setType]=useState(initialType);
+  const [type,setType]=useState("Todos");
+  useEffect(()=>{
+    const selected=new URLSearchParams(window.location.search).get("tipo");
+    if(selected) setType(selected);
+  },[]);
   const [country,setCountry]=useState("Todos");
   const [grape,setGrape]=useState("Todas");
   const [sort,setSort]=useState("relevancia");
