@@ -1,199 +1,121 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 const wines = [
-  { name:"Gran Reserva Malbec", producer:"Bodega Altura", origin:"Mendoza, Argentina", type:"Tinto", price:"R$ 189,90", image:"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=900&q=86", badge:"Destaque" },
-  { name:"Pinot Noir de Parcela", producer:"Casa del Valle", origin:"Patagônia, Argentina", type:"Tinto", price:"R$ 219,00", image:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=900&q=86", badge:"Sommelier" },
-  { name:"Sauvignon Blanc Reserva", producer:"Viña Costera", origin:"Casablanca, Chile", type:"Branco", price:"R$ 139,90", image:"https://images.unsplash.com/photo-1566995541428-f2246c17cda1?auto=format&fit=crop&w=900&q=86", badge:"Novo" },
-  { name:"Rosé de Provence", producer:"Maison Éloise", origin:"Provence, França", type:"Rosé", price:"R$ 169,00", image:"https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=900&q=86", badge:"Seleção" }
+  {name:"Gran Reserva Malbec", winery:"Bodega Altura", year:"2022", rating:"4,4", reviews:"1.280", old:"R$ 229,90", price:"R$ 189,90", discount:"-17%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=85"},
+  {name:"Reserva Cabernet Sauvignon", winery:"Viña del Sur", year:"2021", rating:"4,3", reviews:"842", old:"R$ 179,90", price:"R$ 149,90", discount:"-16%", country:"Chile", type:"Tinto", image:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=700&q=85"},
+  {name:"Sauvignon Blanc Reserva", winery:"Casa Costera", year:"2023", rating:"4,2", reviews:"619", old:"R$ 159,90", price:"R$ 129,90", discount:"-18%", country:"Chile", type:"Branco", image:"https://images.unsplash.com/photo-1566995541428-f2246c17cda1?auto=format&fit=crop&w=700&q=85"},
+  {name:"Rosé de Provence", winery:"Maison Éloise", year:"2023", rating:"4,1", reviews:"397", old:"R$ 189,90", price:"R$ 159,90", discount:"-15%", country:"França", type:"Rosé", image:"https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=700&q=85"},
+  {name:"Pinot Noir Reserva", winery:"Casa del Valle", year:"2022", rating:"4,5", reviews:"1.104", old:"R$ 249,90", price:"R$ 209,90", discount:"-16%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?auto=format&fit=crop&w=700&q=85"}
 ];
 
-const countries = [
-  {name:"Argentina", meta:"Mendoza · Salta · Patagônia"},
-  {name:"Chile", meta:"Maipo · Colchagua · Casablanca"},
-  {name:"Itália", meta:"Toscana · Piemonte · Veneto"},
-  {name:"França", meta:"Bordeaux · Rhône · Provence"}
-];
+const categories = ["Tinto","Branco","Rosé","Espumante","Sobremesa","Fortificado"];
 
-function Icon({ name }: { name: "search"|"bag"|"store"|"menu"|"arrow"|"heart" }) {
-  const paths = {
+function Icon({name}:{name:"search"|"bag"|"user"|"heart"|"menu"|"chev"}) {
+  const p = {
     search:<><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></>,
     bag:<><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></>,
-    store:<><path d="M4 9h16l-1.5-5h-13L4 9Z"/><path d="M6 10v10h12V10"/><path d="M9 20v-6h6v6"/></>,
-    menu:<><path d="M4 7h16M4 12h16M4 17h16"/></>,
-    arrow:<path d="M5 12h14m-5-5 5 5-5 5"/>,
-    heart:<path d="M20 8.6c0 5-8 10.4-8 10.4S4 13.6 4 8.6A4.6 4.6 0 0 1 12 5a4.6 4.6 0 0 1 8 3.6Z"/>
+    user:<><circle cx="12" cy="8" r="3.3"/><path d="M5.5 20c.6-4.3 3-6.5 6.5-6.5s5.9 2.2 6.5 6.5"/></>,
+    heart:<path d="M20 8.6c0 5-8 10.4-8 10.4S4 13.6 4 8.6A4.6 4.6 0 0 1 12 5a4.6 4.6 0 0 1 8 3.6Z"/>,
+    menu:<path d="M4 7h16M4 12h16M4 17h16"/>,
+    chev:<path d="m9 6 6 6-6 6"/>
   };
-  return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">{paths[name]}</svg>;
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">{p[name]}</svg>;
 }
 
-export default function Home() {
-  const [menuOpen,setMenuOpen] = useState(false);
-  const [searchOpen,setSearchOpen] = useState(false);
-  const [adult,setAdult] = useState(true);
-  const [query,setQuery] = useState("");
+function WineCard({wine}:{wine:(typeof wines)[number]}) {
+  return <article className="wineCard">
+    <div className="winePhoto">
+      <Image src={wine.image} alt={wine.name} fill sizes="260px"/>
+      <span className="discount">{wine.discount}</span>
+      <button className="fav" aria-label="Favoritar"><Icon name="heart"/></button>
+    </div>
+    <div className="wineInfo">
+      <p className="winery">{wine.winery}</p>
+      <h3>{wine.name} {wine.year}</h3>
+      <p className="meta">{wine.country} · {wine.type}</p>
+      <div className="rating"><strong>{wine.rating}</strong><span>★★★★★</span><small>({wine.reviews})</small></div>
+      <div className="priceRow"><div><del>{wine.old}</del><b>{wine.price}</b></div><button>Adicionar</button></div>
+    </div>
+  </article>
+}
 
-  useEffect(() => {
-    setAdult(localStorage.getItem("videira-age") === "ok");
-  },[]);
+export default function Home(){
+  const [query,setQuery]=useState("");
+  const [menu,setMenu]=useState(false);
+  const filtered=useMemo(()=>wines.filter(w=>`${w.name} ${w.winery} ${w.country} ${w.type}`.toLowerCase().includes(query.toLowerCase())),[query]);
 
-  const filtered = useMemo(() => wines.filter(w => `${w.name} ${w.producer} ${w.origin} ${w.type}`.toLowerCase().includes(query.toLowerCase())),[query]);
+  return <main>
+    <div className="topbar">Entrega para Foz do Iguaçu e região · Atendimento pelo WhatsApp</div>
 
-  const confirmAge = () => {
-    localStorage.setItem("videira-age","ok");
-    setAdult(true);
-  };
-
-  return (
-    <main>
-      {!adult && (
-        <div className="ageGate">
-          <div className="agePanel">
-            <div className="ageMark">V</div>
-            <p className="eyebrow">BEM-VINDO À VIDEIRA</p>
-            <h1>Vinho é feito de tempo.<br/>A experiência também.</h1>
-            <p>Para continuar, confirme que você tem 18 anos ou mais.</p>
-            <button onClick={confirmAge}>Tenho 18 anos ou mais</button>
-            <small>Beba com moderação. A venda de bebidas alcoólicas é proibida para menores de 18 anos.</small>
-          </div>
-        </div>
-      )}
-
-      <div className="utilityBar">
-        <span>Curadoria especial · atendimento personalizado</span>
-        <div><a href="#catalogo">Catálogo</a><a href="#contato">Fale conosco</a></div>
+    <header className="header">
+      <div className="headerTop">
+        <button className="menuBtn" onClick={()=>setMenu(!menu)}><Icon name="menu"/></button>
+        <a href="#" className="logo"><span className="logoMark">V</span><span>VIDEIRA</span></a>
+        <div className="searchBox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos"/></div>
+        <div className="actions"><button><Icon name="user"/></button><button><Icon name="bag"/><span className="count">0</span></button></div>
       </div>
+      <nav className={menu?"nav open":"nav"}>
+        <a href="#loja">Loja</a><a href="#vinhos">Vinhos</a><a href="#bodegas">Bodegas</a><a href="#uvas">Uvas</a><a href="#ofertas">Ofertas</a>
+      </nav>
+    </header>
 
-      <header className="siteHeader">
-        <div className="headerInner">
-          <button className="mobileIcon" onClick={() => setMenuOpen(!menuOpen)} aria-label="Abrir menu"><Icon name="menu"/></button>
-          <a className="brand" href="#"><span className="brandLeaf">V</span><span>VIDEIRA</span><small>VINHOS & CURADORIA</small></a>
-          <nav className={menuOpen ? "nav open" : "nav"}>
-            <a href="#bodegas">BODEGAS</a>
-            <a href="#uvas">UVAS</a>
-            <a href="#tipos">TIPO DE VINHO</a>
-          </nav>
-          <div className="headerActions">
-            <button onClick={() => setSearchOpen(true)} aria-label="Pesquisar"><Icon name="search"/></button>
-            <button aria-label="Carrinho"><Icon name="bag"/><span className="cartCount">0</span></button>
-            <a className="storeLink" href="#catalogo"><Icon name="store"/><span>LOJA</span></a>
-          </div>
-        </div>
-      </header>
+    <section className="hero">
+      <div>
+        <span className="pill">SELEÇÃO VIDEIRA</span>
+        <h1>Encontre o vinho certo para cada momento.</h1>
+        <p>Explore rótulos selecionados, compare estilos e encontre novas garrafas para descobrir.</p>
+        <a href="#vinhos" className="heroBtn">Explorar vinhos</a>
+      </div>
+      <div className="heroCard">
+        <span>Escolha da casa</span><strong>Malbec argentino</strong><small>Frutado · intenso · elegante</small>
+      </div>
+    </section>
 
-      {searchOpen && (
-        <div className="searchLayer">
-          <button className="closeSearch" onClick={() => setSearchOpen(false)}>×</button>
-          <div className="searchContent">
-            <p className="eyebrow">ENCONTRE SEU VINHO</p>
-            <input autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder="Busque por vinho, bodega, uva ou região"/>
-            <div className="searchResults">
-              {(query ? filtered : wines.slice(0,3)).map(w => (
-                <a key={w.name} href="#catalogo" onClick={()=>setSearchOpen(false)}>
-                  <span>{w.name}<small>{w.producer} · {w.origin}</small></span><b>{w.price}</b>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+    <section className="content" id="loja">
+      <h2>Compre vinhos bem avaliados</h2>
+      <div className="categoryRow">{categories.map(c=><button key={c}>{c}</button>)}</div>
 
-      <section className="hero">
-        <div className="heroTexture"/>
-        <div className="heroCopy">
-          <p className="eyebrow light">CURADORIA VIDEIRA · EDIÇÃO 01</p>
-          <h1>Vinhos que contam<br/>de onde vieram.</h1>
-          <p>Uma seleção feita para quem procura origem, personalidade e uma boa história em cada garrafa.</p>
-          <a className="primaryCta" href="#catalogo">EXPLORAR SELEÇÃO <Icon name="arrow"/></a>
-        </div>
-        <div className="heroVisual" aria-hidden="true">
-          <div className="halo"/>
-          <div className="bottle bottleBack"><span>V</span></div>
-          <div className="bottle bottleFront"><span className="bottleLabel"><b>VIDEIRA</b><i>Reserva</i><small>Malbec · 2022</small></span></div>
-          <div className="heroSeal"><strong>01</strong><span>SELEÇÃO<br/>DA CASA</span></div>
-        </div>
-        <div className="heroFoot"><span>01 / 03</span><div className="line"/><span>MENDOZA · ARGENTINA</span></div>
+      <section className="shelf" id="ofertas">
+        <div className="shelfHead"><div><h2>Ofertas para você</h2><p>Ótimo custo-benefício em rótulos selecionados.</p></div><a href="#">Ver tudo <Icon name="chev"/></a></div>
+        <div className="wineRail">{(query?filtered:wines).map(w=><WineCard key={w.name} wine={w}/>)}</div>
       </section>
 
-      <section className="intro">
-        <p className="eyebrow">NOSSA CURADORIA</p>
-        <div className="introGrid">
-          <h2>Menos rótulos por acaso.<br/><em>Mais escolhas com sentido.</em></h2>
-          <p>Selecionamos vinhos por origem, produtor e expressão. Do clássico ao novo, cada garrafa entra no catálogo por um motivo.</p>
+      <section className="benefitGrid">
+        <div><b>Curadoria especializada</b><span>Rótulos escolhidos com critério.</span></div>
+        <div><b>Compra simples</b><span>Escolha, adicione e finalize pelo atendimento.</span></div>
+        <div><b>Atendimento humano</b><span>Ajuda para encontrar o vinho ideal.</span></div>
+      </section>
+
+      <section className="shelf" id="vinhos">
+        <div className="shelfHead"><div><h2>Mais procurados</h2><p>Os rótulos que estão chamando mais atenção.</p></div><a href="#">Ver tudo <Icon name="chev"/></a></div>
+        <div className="wineRail">{wines.slice().reverse().map(w=><WineCard key={w.name+"2"} wine={w}/>)}</div>
+      </section>
+
+      <section className="styles">
+        <h2>Explore por estilo</h2>
+        <div className="styleCards">
+          <a href="#"><strong>Tintos encorpados</strong><span>Cabernet · Malbec · Syrah</span></a>
+          <a href="#"><strong>Brancos frescos</strong><span>Sauvignon · Chardonnay</span></a>
+          <a href="#"><strong>Rosés leves</strong><span>Provence · Grenache</span></a>
+          <a href="#"><strong>Espumantes</strong><span>Brut · Extra Brut</span></a>
         </div>
       </section>
 
-      <section className="wineSection" id="catalogo">
-        <div className="sectionHead">
-          <div><p className="eyebrow">DESTAQUES</p><h2>Escolhas da semana</h2></div>
-          <a href="#">VER TODOS <Icon name="arrow"/></a>
-        </div>
-        <div className="wineGrid">
-          {wines.map((wine, i) => (
-            <article className="wineCard" key={wine.name}>
-              <div className="wineImage">
-                <Image src={wine.image} alt={wine.name} fill sizes="(max-width: 800px) 80vw, 25vw" priority={i<2}/>
-                <span className="badge">{wine.badge}</span>
-                <button className="heart" aria-label="Favoritar"><Icon name="heart"/></button>
-              </div>
-              <div className="wineMeta">
-                <p>{wine.producer}</p>
-                <h3>{wine.name}</h3>
-                <span>{wine.origin} · {wine.type}</span>
-                <div><b>{wine.price}</b><button>ADICIONAR</button></div>
-              </div>
-            </article>
-          ))}
-        </div>
+      <section className="newsletter">
+        <div><span>VIDEIRA</span><h2>Descubra novos rótulos.</h2><p>Receba novidades, seleções e ofertas especiais.</p></div>
+        <div><input placeholder="Seu melhor e-mail"/><button>Quero receber</button></div>
       </section>
+    </section>
 
-      <section className="discovery" id="tipos">
-        <div className="discoveryCopy">
-          <p className="eyebrow light">DESCUBRA POR ESTILO</p>
-          <h2>Qual vinho combina<br/>com o seu momento?</h2>
-          <p>Explore a seleção a partir do que você quer sentir na taça.</p>
-        </div>
-        <div className="styleList">
-          {["Tintos intensos","Brancos frescos","Rosés delicados","Espumantes"].map((item,i)=>(
-            <a href="#" key={item}><span>0{i+1}</span><strong>{item}</strong><Icon name="arrow"/></a>
-          ))}
-        </div>
-      </section>
-
-      <section className="origins" id="bodegas">
-        <div className="sectionHead">
-          <div><p className="eyebrow">ORIGENS</p><h2>Viaje pela taça</h2></div>
-        </div>
-        <div className="countryGrid">
-          {countries.map((c,i)=>(
-            <a href="#" className="countryCard" key={c.name}>
-              <span>0{i+1}</span><h3>{c.name}</h3><p>{c.meta}</p><Icon name="arrow"/>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="grapes" id="uvas">
-        <div className="grapeVisual"><span className="grapeCluster">●<br/>● ●<br/>● ● ●<br/> ● ●<br/> ●</span></div>
-        <div className="grapeCopy">
-          <p className="eyebrow">GUIA DE UVAS</p>
-          <h2>Conheça o vinho<br/>pela sua essência.</h2>
-          <p>Malbec, Cabernet Sauvignon, Chardonnay, Pinot Noir e muitas outras. Entenda perfis, aromas e combinações.</p>
-          <a className="textCta" href="#">EXPLORAR UVAS <Icon name="arrow"/></a>
-        </div>
-      </section>
-
-      <footer id="contato">
-        <div className="footerBrand"><span className="brandLeaf">V</span><b>VIDEIRA</b><p>Vinhos escolhidos para serem lembrados.</p></div>
-        <div><h4>EXPLORAR</h4><a href="#catalogo">Catálogo</a><a href="#bodegas">Bodegas</a><a href="#uvas">Uvas</a></div>
-        <div><h4>ATENDIMENTO</h4><a href="#">WhatsApp</a><a href="#">Instagram</a><a href="#">Dúvidas frequentes</a></div>
-        <div><h4>NEWSLETTER</h4><p>Receba novidades e seleções especiais.</p><div className="newsletter"><input placeholder="Seu e-mail"/><button>→</button></div></div>
-        <small>© 2026 Videira. Venda proibida para menores de 18 anos.</small>
-      </footer>
-
-      <a className="whatsapp" href="https://wa.me/" aria-label="WhatsApp">WA</a>
-    </main>
-  );
+    <footer>
+      <div className="footerLogo"><span className="logoMark">V</span><b>VIDEIRA</b><p>Vinhos & curadoria</p></div>
+      <div><b>Comprar</b><a href="#vinhos">Vinhos</a><a href="#ofertas">Ofertas</a><a href="#bodegas">Bodegas</a></div>
+      <div><b>Ajuda</b><a href="#">WhatsApp</a><a href="#">Instagram</a><a href="#">Entrega</a></div>
+      <small>© 2026 Videira · Venda proibida para menores de 18 anos.</small>
+    </footer>
+    <a className="whatsapp" href="https://wa.me/" aria-label="WhatsApp">WA</a>
+  </main>
 }
