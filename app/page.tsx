@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";\nimport ProductRail from "@/components/ProductRail";\nimport CartButton from "@/components/CartButton";
 
 const wines = [
   {name:"Gran Reserva Malbec", winery:"Bodega Altura", year:"2022", rating:"4,4", reviews:"1.280", old:"R$ 229,90", price:"R$ 189,90", discount:"-17%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=85"},
@@ -61,7 +61,7 @@ export default function Home(){
         <button className="menuBtn" onClick={()=>setMenu(!menu)}><Icon name="menu"/></button>
         <a href="/" className="logo"><span className="logoMark">V</span><span>VIDEIRA</span></a>
         <div className="searchBox"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos"/></div>
-        <div className="actions"><button><Icon name="user"/></button><button><Icon name="bag"/><span className="count">0</span></button></div>
+        <div className="actions"><button><Icon name="user"/></button><CartButton/></div>
       </div>
       <nav className={menu?"nav open":"nav"}>
         <a href="/loja">Loja</a><a href="#vinhos">Vinhos</a><a href="#bodegas">Bodegas</a><a href="#uvas">Uvas</a><a href="#ofertas">Ofertas</a>
@@ -86,7 +86,7 @@ export default function Home(){
 
       <section className="shelf" id="ofertas">
         <div className="shelfHead"><div><h2>Ofertas para você</h2><p>Ótimo custo-benefício em rótulos selecionados.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
-        <div className="wineRail">{(query?filtered:wines).map(w=><WineCard key={w.name} wine={w}/>)}</div>
+        <ProductRail items={query?filtered:wines}/>
       </section>
 
       <section className="benefitGrid">
@@ -97,7 +97,7 @@ export default function Home(){
 
       <section className="shelf" id="vinhos">
         <div className="shelfHead"><div><h2>Mais procurados</h2><p>Os rótulos que estão chamando mais atenção.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
-        <div className="wineRail">{wines.slice().reverse().map(w=><WineCard key={w.name+"2"} wine={w}/>)}</div>
+        <ProductRail items={wines.slice().reverse()}/>
       </section>
 
       <section className="styles">
@@ -119,9 +119,9 @@ export default function Home(){
     <footer>
       <div className="footerLogo"><span className="logoMark">V</span><b>VIDEIRA</b><p>Vinhos & curadoria</p></div>
       <div><b>Comprar</b><a href="/loja">Vinhos</a><a href="/loja">Ofertas</a><a href="/loja">Bodegas</a></div>
-      <div><b>Ajuda</b><a href="#">WhatsApp</a><a href="#">Instagram</a><a href="#">Entrega</a></div>
+      <div><b>Redes sociais</b><a href="https://instagram.com/videiravinhoteca" target="_blank">@videiravinhoteca</a><a href="https://wa.me/5545999056277" target="_blank">WhatsApp · 45 99905-6277</a><a href="#">Entrega</a></div>
       <small>© 2026 Videira · Venda proibida para menores de 18 anos.</small>
     </footer>
-    <a className="whatsapp" href="https://wa.me/" aria-label="WhatsApp"><WhatsappIcon/></a>
+    <a className="whatsapp" href="https://wa.me/5545999056277" target="_blank" aria-label="WhatsApp"><WhatsappIcon/></a>
   </main>
 }
