@@ -33,7 +33,7 @@ export default function Admin(){
 
   async function saveRow(e:FormEvent<HTMLFormElement>){
     e.preventDefault();setSaving(true);
-    const fd=new FormData(e.currentTarget), obj:Object.fromEntries(fd.entries());
+    const fd=new FormData(e.currentTarget), obj:any=Object.fromEntries(fd.entries());
     ["price","old_price","vintage","sort_order","stock"].forEach(k=>{if(k in obj)obj[k]=obj[k]===""?null:Number(obj[k])});
     if("active" in obj)obj.active=fd.get("active")==="on";
     if(tab==="produtos" && typeof obj.grapes==="string") obj.grapes=String(obj.grapes).split(",").map(x=>x.trim()).filter(Boolean);
@@ -44,7 +44,7 @@ export default function Admin(){
   }
   async function del(id:any){if(!confirm("Excluir este item?"))return;const {error}=await supabase.from(tableFor(tab)).delete().eq("id",id);if(error)alert(error.message);else load(tab)}
   async function saveSettings(e:FormEvent<HTMLFormElement>){
-    e.preventDefault();setSaving(true);const obj=Object.fromEntries(new FormData(e.currentTarget).entries());
+    e.preventDefault();setSaving(true);const obj:any=Object.fromEntries(new FormData(e.currentTarget).entries());
     const {error}=await supabase.from("site_settings").update(obj).eq("id",1);setSaving(false);if(error)alert(error.message);else{alert("Configurações salvas.");load("site")}
   }
   if(!ready)return null;
