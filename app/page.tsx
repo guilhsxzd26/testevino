@@ -10,10 +10,22 @@ const wines = [
   {name:"Reserva Cabernet Sauvignon", winery:"Viña del Sur", year:"2021", rating:"4,3", reviews:"842", old:"R$ 179,90", price:"R$ 149,90", discount:"-16%", country:"Chile", type:"Tinto", image:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=700&q=85"},
   {name:"Sauvignon Blanc Reserva", winery:"Casa Costera", year:"2023", rating:"4,2", reviews:"619", old:"R$ 159,90", price:"R$ 129,90", discount:"-18%", country:"Chile", type:"Branco", image:"https://images.unsplash.com/photo-1566995541428-f2246c17cda1?auto=format&fit=crop&w=700&q=85"},
   {name:"Rosé de Provence", winery:"Maison Éloise", year:"2023", rating:"4,1", reviews:"397", old:"R$ 189,90", price:"R$ 159,90", discount:"-15%", country:"França", type:"Rosé", image:"https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=700&q=85"},
-  {name:"Pinot Noir Reserva", winery:"Casa del Valle", year:"2022", rating:"4,5", reviews:"1.104", old:"R$ 249,90", price:"R$ 209,90", discount:"-16%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?auto=format&fit=crop&w=700&q=85"}
+  {name:"Pinot Noir Reserva", winery:"Casa del Valle", year:"2022", rating:"4,5", reviews:"1.104", old:"R$ 249,90", price:"R$ 209,90", discount:"-16%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?auto=format&fit=crop&w=700&q=85"},
+  {name:"Cabernet Franc Reserva", winery:"Bodega Altura", year:"2022", rating:"4,3", reviews:"524", old:"R$ 209,90", price:"R$ 179,90", discount:"-14%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=700&q=85"},
+  {name:"Brut Nature", winery:"Serra Alta", year:"2023", rating:"4,2", reviews:"408", old:"R$ 169,90", price:"R$ 139,90", discount:"-18%", country:"Brasil", type:"Espumante", image:"https://images.unsplash.com/photo-1547595628-c61a29f496f0?auto=format&fit=crop&w=700&q=85"},
+  {name:"Chardonnay Reserva", winery:"Valle Claro", year:"2023", rating:"4,1", reviews:"337", old:"R$ 159,90", price:"R$ 129,90", discount:"-18%", country:"Argentina", type:"Branco", image:"https://images.unsplash.com/photo-1566995541428-f2246c17cda1?auto=format&fit=crop&w=700&q=85"}
 ];
 
 const categories = ["Tinto","Branco","Rosé","Espumante","Sobremesa","Fortificado"];
+const grapes = [
+  {name:"Malbec",desc:"Frutado, macio e intenso"},
+  {name:"Cabernet Franc",desc:"Elegante, herbal e fresco"},
+  {name:"Cabernet Sauvignon",desc:"Estruturado e clássico"},
+  {name:"Pinot Noir",desc:"Leve, delicado e aromático"},
+  {name:"Chardonnay",desc:"Versátil, fresco ou cremoso"},
+  {name:"Sauvignon Blanc",desc:"Cítrico, vibrante e refrescante"},
+  {name:"Syrah",desc:"Especiado, profundo e marcante"}
+];
 
 function Icon({name}:{name:"search"|"bag"|"user"|"heart"|"menu"|"chev"}) {
   const p = {
@@ -89,6 +101,26 @@ export default function Home(){
       <section className="shelf" id="ofertas">
         <div className="shelfHead"><div><h2>Ofertas para você</h2><p>Ótimo custo-benefício em rótulos selecionados.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
         <ProductRail items={query?filtered:wines}/>
+      </section>
+
+      <section className="shelf">
+        <div className="shelfHead"><div><h2>Novidades</h2><p>Rótulos que acabaram de chegar à Videira.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
+        <ProductRail items={wines.slice().reverse()}/>
+      </section>
+
+      <section className="shelf">
+        <div className="shelfHead"><div><h2>Malbec</h2><p>Seleção de Malbecs para descobrir.</p></div><a href="/loja?uva=Malbec">Ver tudo <Icon name="chev"/></a></div>
+        <ProductRail items={wines.filter(w=>w.name.toLowerCase().includes("malbec"))}/>
+      </section>
+
+      <section className="shelf">
+        <div className="shelfHead"><div><h2>Cabernet Franc</h2><p>Elegância e frescor em uma das uvas mais queridas.</p></div><a href="/loja?uva=Cabernet%20Franc">Ver tudo <Icon name="chev"/></a></div>
+        <ProductRail items={wines.filter(w=>w.name.toLowerCase().includes("cabernet franc"))}/>
+      </section>
+
+      <section className="grapeSection" id="uvas">
+        <div className="shelfHead"><div><h2>Explore por uva</h2><p>Arraste para conhecer as principais uvas do catálogo.</p></div></div>
+        <div className="grapeRail">{[...grapes,...grapes].map((g,i)=><a href={`/loja?uva=${encodeURIComponent(g.name)}`} className="grapeCard" key={g.name+i}><span>UVA</span><strong>{g.name}</strong><small>{g.desc}</small><b>Explorar →</b></a>)}</div>
       </section>
 
       <section className="benefitGrid">
