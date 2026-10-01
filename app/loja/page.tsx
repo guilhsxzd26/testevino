@@ -1,62 +1,65 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import CartButton from "@/components/CartButton";
 import { addToCart } from "@/lib/cart";
+import { supabase } from "@/lib/supabase";
 
-const wines = [
-  {name:"Gran Reserva Malbec", winery:"Bodega Altura", year:"2022", rating:"4,4", reviews:"1.280", old:"R$ 229,90", price:"R$ 189,90", discount:"-17%", country:"Argentina", region:"Mendoza", grape:"Malbec", type:"Tinto", image:"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=85"},
-  {name:"Reserva Cabernet Sauvignon", winery:"Viña del Sur", year:"2021", rating:"4,3", reviews:"842", old:"R$ 179,90", price:"R$ 149,90", discount:"-16%", country:"Chile", region:"Maipo", grape:"Cabernet Sauvignon", type:"Tinto", image:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=700&q=85"},
-  {name:"Sauvignon Blanc Reserva", winery:"Casa Costera", year:"2023", rating:"4,2", reviews:"619", old:"R$ 159,90", price:"R$ 129,90", discount:"-18%", country:"Chile", region:"Casablanca", grape:"Sauvignon Blanc", type:"Branco", image:"https://images.unsplash.com/photo-1566995541428-f2246c17cda1?auto=format&fit=crop&w=700&q=85"},
-  {name:"Rosé de Provence", winery:"Maison Éloise", year:"2023", rating:"4,1", reviews:"397", old:"R$ 189,90", price:"R$ 159,90", discount:"-15%", country:"França", region:"Provence", grape:"Grenache", type:"Rosé", image:"https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=700&q=85"},
-  {name:"Pinot Noir Reserva", winery:"Casa del Valle", year:"2022", rating:"4,5", reviews:"1.104", old:"R$ 249,90", price:"R$ 209,90", discount:"-16%", country:"Argentina", region:"Patagônia", grape:"Pinot Noir", type:"Tinto", image:"https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?auto=format&fit=crop&w=700&q=85"},
-  {name:"Brut Reserva", winery:"Serra Alta", year:"2023", rating:"4,2", reviews:"512", old:"R$ 149,90", price:"R$ 119,90", discount:"-20%", country:"Brasil", region:"Serra Gaúcha", grape:"Chardonnay", type:"Espumante", image:"https://images.unsplash.com/photo-1547595628-c61a29f496f0?auto=format&fit=crop&w=700&q=85"},
-  {name:"Chardonnay Barricado", winery:"Valle Claro", year:"2022", rating:"4,0", reviews:"284", old:"R$ 169,90", price:"R$ 139,90", discount:"-17%", country:"Argentina", region:"Mendoza", grape:"Chardonnay", type:"Branco", image:"https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=700&q=85"},
-  {name:"Syrah Gran Selección", winery:"Viña del Sur", year:"2021", rating:"4,4", reviews:"731", old:"R$ 199,90", price:"R$ 169,90", discount:"-15%", country:"Chile", region:"Colchagua", grape:"Syrah", type:"Tinto", image:"https://images.unsplash.com/photo-1515779122185-2390ccdf060b?auto=format&fit=crop&w=700&q=85"}
-];
+type Wine={
+  id:string; name:string; winery:string|null; vintage:number|null; rating:number|null; review_count:number|null;
+  old_price:number|null; price:number|null; discount_pct:number|null; country:string|null; region:string|null;
+  grapes:string[]; type:string; image_url:string|null; active:boolean;
+};
 
-const money=(v:string)=>Number(v.replace(/[^\\d,]/g,"").replace(",", "."));
+const fallback="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=85";
+const brl=(n:number|null)=>n==null?"Sob consulta":n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 function Search(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>}
 function Heart(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M20 8.6c0 5-8 10.4-8 10.4S4 13.6 4 8.6A4.6 4.6 0 0 1 12 5a4.6 4.6 0 0 1 8 3.6Z"/></svg>}
 
-function InstagramIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>}
-function SocialWhatsappIcon(){return <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.02 5.2A10.7 10.7 0 0 0 6.8 21.34L5.2 26.8l5.6-1.48a10.72 10.72 0 1 0 5.22-20.12Zm0 19.5a8.73 8.73 0 0 1-4.46-1.22l-.32-.19-3.32.88.89-3.23-.2-.33A8.75 8.75 0 1 1 16.02 24.7Zm4.8-6.55c-.26-.13-1.56-.77-1.8-.86-.24-.09-.41-.13-.59.13-.17.26-.67.86-.82 1.04-.15.17-.3.2-.56.07-.26-.13-1.1-.41-2.1-1.3-.77-.69-1.3-1.54-1.45-1.8-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.33-.02-.46-.07-.13-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45h-.5c-.17 0-.46.07-.7.33-.24.26-.91.89-.91 2.17s.93 2.52 1.06 2.7c.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.56-.64 1.78-1.26.22-.62.22-1.15.15-1.26-.06-.11-.24-.17-.5-.3Z"/></svg>}
-
-function WhatsappIcon(){return <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.02 5.2A10.7 10.7 0 0 0 6.8 21.34L5.2 26.8l5.6-1.48a10.72 10.72 0 1 0 5.22-20.12Zm0 19.5a8.73 8.73 0 0 1-4.46-1.22l-.32-.19-3.32.88.89-3.23-.2-.33A8.75 8.75 0 1 1 16.02 24.7Zm4.8-6.55c-.26-.13-1.56-.77-1.8-.86-.24-.09-.41-.13-.59.13-.17.26-.67.86-.82 1.04-.15.17-.3.2-.56.07-.26-.13-1.1-.41-2.1-1.3-.77-.69-1.3-1.54-1.45-1.8-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.33-.02-.46-.07-.13-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45h-.5c-.17 0-.46.07-.7.33-.24.26-.91.89-.91 2.17s.93 2.52 1.06 2.7c.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.56-.64 1.78-1.26.22-.62.22-1.15.15-1.26-.06-.11-.24-.17-.5-.3Z"/></svg>}
-
 export default function Loja(){
+  const [wines,setWines]=useState<Wine[]>([]);
   const [query,setQuery]=useState("");
   const [type,setType]=useState("Todos");
-  useEffect(()=>{
-    const params=new URLSearchParams(window.location.search);
-    const selectedType=params.get("tipo");
-    const selectedGrape=params.get("uva");
-    const selectedWinery=params.get("bodega");
-    if(selectedType) setType(selectedType);
-    if(selectedGrape) setGrape(selectedGrape);
-    if(selectedWinery) setWinery(selectedWinery);
-  },[]);
   const [country,setCountry]=useState("Todos");
   const [grape,setGrape]=useState("Todas");
   const [winery,setWinery]=useState("Todas");
   const [sort,setSort]=useState("relevancia");
+  const [loading,setLoading]=useState(true);
 
-  const filtered = useMemo(()=>{
+  useEffect(()=>{
+    (async()=>{
+      const params=new URLSearchParams(window.location.search);
+      if(params.get("tipo")) setType(params.get("tipo")!);
+      if(params.get("uva")) setGrape(params.get("uva")!);
+      if(params.get("bodega")) setWinery(params.get("bodega")!);
+      const {data}=await supabase.from("wines").select("*").eq("active",true).order("sort_order");
+      setWines(data||[]);
+      setLoading(false);
+    })();
+  },[]);
+
+  const filtered=useMemo(()=>{
     let result=wines.filter(w=>{
-      const q=`${w.name} ${w.winery} ${w.country} ${w.region} ${w.grape} ${w.type}`.toLowerCase();
-      return (!query || q.includes(query.toLowerCase())) &&
-        (type==="Todos" || w.type===type) &&
-        (country==="Todos" || w.country===country) &&
-        (grape==="Todas" || w.grape===grape) &&
-        (winery==="Todas" || w.winery===winery);
+      const text=[w.name,w.winery,w.country,w.region,...(w.grapes||[]),w.type].join(" ").toLowerCase();
+      return (!query||text.includes(query.toLowerCase()))
+        &&(type==="Todos"||w.type===type)
+        &&(country==="Todos"||w.country===country)
+        &&(grape==="Todas"||(w.grapes||[]).includes(grape))
+        &&(winery==="Todas"||w.winery===winery);
     });
-    if(sort==="avaliacao") result=[...result].sort((a,b)=>Number(b.rating.replace(",","."))-Number(a.rating.replace(",",".")));
-    if(sort==="menor") result=[...result].sort((a,b)=>Number(a.price.replace(/[^d,]/g,"").replace(",","."))-Number(b.price.replace(/[^d,]/g,"").replace(",",".")));
+    if(sort==="avaliacao") result=[...result].sort((a,b)=>(b.rating||0)-(a.rating||0));
+    if(sort==="menor") result=[...result].sort((a,b)=>(a.price??999999)-(b.price??999999));
     return result;
-  },[query,type,country,grape,winery,sort]);
+  },[wines,query,type,country,grape,winery,sort]);
 
-  const add=(w:(typeof wines)[number])=>addToCart({id:`${w.winery}-${w.name}-${w.year}`,name:`${w.name} ${w.year}`,winery:w.winery,year:w.year,price:money(w.price),image:w.image});
+  const countries=[...new Set(wines.map(w=>w.country).filter(Boolean))] as string[];
+  const grapes=[...new Set(wines.flatMap(w=>w.grapes||[]))];
+  const wineries=[...new Set(wines.map(w=>w.winery).filter(Boolean))] as string[];
+  const types=[...new Set(wines.map(w=>w.type).filter(Boolean))];
+
+  const add=(w:Wine)=>{
+    addToCart({id:w.id,name:[w.name,w.vintage].filter(Boolean).join(" "),winery:w.winery||"Videira",year:w.vintage||"",price:Number(w.price)||0,image:w.image_url||fallback});
+  };
 
   return <main>
     <div className="topbar">Entrega para Foz do Iguaçu e região · Atendimento pelo WhatsApp</div>
@@ -66,53 +69,35 @@ export default function Loja(){
         <div className="searchBox"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinho, bodega, uva ou região"/></div>
         <div className="actions"><a href="/">Início</a><CartButton/></div>
       </div>
-      <nav className="nav">
-        <a href="/loja" className="active">Loja</a>
-        <div className="navDrop"><a href="/loja">Vinhos</a><div className="dropdownPanel"><span>TIPOS DE VINHO</span><div>{["Tinto","Branco","Rosé","Espumante","Sobremesa","Fortificado"].map(c=><a key={c} href={`/loja?tipo=${encodeURIComponent(c)}`}>{c}</a>)}</div></div></div>
-        <div className="navDrop"><a href="/loja">Bodegas</a><div className="dropdownPanel wide"><span>BODEGAS</span><div>{[...new Set(wines.map(w=>w.winery))].map(b=><a key={b} href={`/loja?bodega=${encodeURIComponent(b)}`}>{b}</a>)}</div></div></div>
-        <div className="navDrop"><a href="/loja">Uvas</a><div className="dropdownPanel wide"><span>UVAS</span><div>{[...new Set(wines.map(w=>w.grape))].map(g=><a key={g} href={`/loja?uva=${encodeURIComponent(g)}`}>{g}</a>)}</div></div></div>
-        <a href="/#ofertas">Ofertas</a>
-      </nav>
+      <nav className="nav"><a href="/loja" className="active">Loja</a><a href="/loja">Vinhos</a><a href="/loja">Bodegas</a><a href="/loja">Uvas</a><a href="/#ofertas">Ofertas</a></nav>
     </header>
 
-    <section className="shopHero">
-      <div><span>CATÁLOGO VIDEIRA</span><h1>Loja</h1><p>Encontre seu próximo vinho usando pesquisa e filtros.</p></div>
-      <strong>{filtered.length} rótulos</strong>
-    </section>
+    <section className="shopHero"><div><span>CATÁLOGO VIDEIRA</span><h1>Loja</h1><p>Encontre seu próximo vinho usando pesquisa e filtros.</p></div><strong>{filtered.length} rótulos</strong></section>
 
-    <div className="shopSearchWrap"><div className="shopSearchLive"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos, bodegas, uvas ou regiões"/><span>{query ? `${filtered.length} resultado(s)` : "Busca em tempo real"}</span></div></div>
+    <div className="shopSearchWrap"><div className="shopSearchLive"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos, bodegas, uvas ou regiões"/><span>{query?`${filtered.length} resultado(s)`:"Busca em tempo real"}</span></div></div>
+
     <section className="shopLayout">
       <aside className="filters">
         <div className="filterHead"><b>Filtros</b><button onClick={()=>{setType("Todos");setCountry("Todos");setGrape("Todas");setWinery("Todas");setQuery("")}}>Limpar</button></div>
-        <label>Tipo de vinho<select value={type} onChange={e=>setType(e.target.value)}><option>Todos</option><option>Tinto</option><option>Branco</option><option>Rosé</option><option>Espumante</option></select></label>
-        <label>País<select value={country} onChange={e=>setCountry(e.target.value)}><option>Todos</option><option>Argentina</option><option>Chile</option><option>França</option><option>Brasil</option></select></label>
-        <label>Uva<select value={grape} onChange={e=>setGrape(e.target.value)}><option>Todas</option><option>Malbec</option><option>Cabernet Sauvignon</option><option>Cabernet Franc</option><option>Sauvignon Blanc</option><option>Pinot Noir</option><option>Grenache</option><option>Chardonnay</option><option>Syrah</option></select></label><label>Bodega<select value={winery} onChange={e=>setWinery(e.target.value)}><option>Todas</option>{[...new Set(wines.map(w=>w.winery))].map(x=><option key={x}>{x}</option>)}</select></label>
+        <label>Tipo de vinho<select value={type} onChange={e=>setType(e.target.value)}><option>Todos</option>{types.map(x=><option key={x}>{x}</option>)}</select></label>
+        <label>País<select value={country} onChange={e=>setCountry(e.target.value)}><option>Todos</option>{countries.map(x=><option key={x}>{x}</option>)}</select></label>
+        <label>Uva<select value={grape} onChange={e=>setGrape(e.target.value)}><option>Todas</option>{grapes.map(x=><option key={x}>{x}</option>)}</select></label>
+        <label>Bodega<select value={winery} onChange={e=>setWinery(e.target.value)}><option>Todas</option>{wineries.map(x=><option key={x}>{x}</option>)}</select></label>
       </aside>
 
       <div className="shopMain">
-        <div className="shopToolbar">
-          <div className="mobileSearch"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos"/></div>
-          <span>{filtered.length} produtos</span>
-          <label>Ordenar por <select value={sort} onChange={e=>setSort(e.target.value)}><option value="relevancia">Relevância</option><option value="avaliacao">Melhor avaliação</option><option value="menor">Menor preço</option></select></label>
-        </div>
-
+        <div className="shopToolbar"><span>{loading?"Carregando...":filtered.length+" produtos"}</span><label>Ordenar por <select value={sort} onChange={e=>setSort(e.target.value)}><option value="relevancia">Relevância</option><option value="avaliacao">Melhor avaliação</option><option value="menor">Menor preço</option></select></label></div>
         <div className="shopGrid">
-          {filtered.map(w=><article className="wineCard" key={w.name}>
-            <div className="winePhoto"><Image src={w.image} alt={w.name} fill sizes="(max-width:700px) 46vw, 240px"/><span className="discount">{w.discount}</span><button className="fav"><Heart/></button></div>
-            <div className="wineInfo"><p className="winery">{w.winery}</p><h3>{w.name} {w.year}</h3><p className="meta">{w.region}, {w.country} · {w.type}</p><div className="rating"><strong>{w.rating}</strong><span>★★★★★</span><small>({w.reviews})</small></div><div className="priceRow"><div><del>{w.old}</del><b>{w.price}</b></div><button onClick={()=>add(w)}>Adicionar</button></div></div>
+          {filtered.map(w=><article className="wineCard" key={w.id}>
+            <a className="productLink" href={"/produto/"+w.id}>
+              <div className="winePhoto"><img src={w.image_url||fallback} alt={w.name}/>{w.discount_pct? <span className="discount">-{w.discount_pct}%</span>:null}<button className="fav" type="button" onClick={e=>e.preventDefault()}><Heart/></button></div>
+              <div className="wineInfo"><p className="winery">{w.winery}</p><h3>{w.name} {w.vintage||""}</h3><p className="meta">{[w.region,w.country,w.type].filter(Boolean).join(" · ")}</p><div className="rating"><strong>{String(w.rating??4.3).replace(".",",")}</strong><span>★★★★★</span><small>({w.review_count??0})</small></div></div>
+            </a>
+            <div className="priceRow shopCardPrice"><div>{w.old_price&&<del>{brl(w.old_price)}</del>}<b>{brl(w.price)}</b></div><button onClick={()=>add(w)}>Adicionar</button></div>
           </article>)}
         </div>
-        {!filtered.length && <div className="emptyState"><h2>Nenhum vinho encontrado</h2><p>Tente remover algum filtro ou pesquisar outro termo.</p></div>}
+        {!loading&&!filtered.length&&<div className="emptyState"><h2>Nenhum vinho encontrado</h2><p>Tente remover algum filtro ou pesquisar outro termo.</p></div>}
       </div>
     </section>
-
-    <footer className="siteFooter">
-      <div className="footerBrandBlock"><div className="footerLogo"><span className="logoMark">V</span><b>VIDEIRA</b></div><p>Vinhos & curadoria</p><small>Uma seleção pensada para descobrir, comparar e escolher melhor.</small></div>
-      <div className="footerCol"><b>Menu</b><a href="/">Início</a><a href="/loja">Loja</a><a href="/#ofertas">Ofertas</a><a href="/#uvas">Uvas</a></div>
-      <div className="footerCol"><b>Catálogo</b><a href="/loja?tipo=Tinto">Tintos</a><a href="/loja?tipo=Branco">Brancos</a><a href="/loja?tipo=Rosé">Rosés</a><a href="/loja?tipo=Espumante">Espumantes</a></div>
-      <div className="footerCol socialCol"><b>Redes sociais</b><a href="https://instagram.com/videiravinhoteca" target="_blank"><span className="socialIcon"><InstagramIcon/></span><span>@videiravinhoteca</span></a><a href="https://wa.me/5545999056277" target="_blank"><span className="socialIcon wa"><SocialWhatsappIcon/></span><span>45 99905-6277</span></a></div>
-      <div className="footerBottom"><span>© 2026 Videira Vinhoteca</span><span>Venda proibida para menores de 18 anos.</span></div>
-    </footer>
-    <a className="whatsapp" href="https://wa.me/5545999056277" target="_blank" aria-label="WhatsApp"><WhatsappIcon/></a>
   </main>
 }
