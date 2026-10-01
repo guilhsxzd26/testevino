@@ -77,3 +77,53 @@ footer{background:#201b18}
   .footerBottom{flex-direction:column;gap:6px}
   .grapeSectionFinal .shelfHead h2{font-size:25px}
 }
+
+/* ODA Al Vino palette sampled from provided references */
+:root{
+  --oda-bordeaux:#780148;
+  --oda-bordeaux-deep:#4d0830;
+  --oda-bordeaux-dark:#4b072e;
+  --oda-cream:#fff5e1;
+  --oda-cream-soft:#f3e8d6;
+  --oda-olive:#4c5409;
+  --oda-olive-soft:#575819;
+  --oda-charcoal:#201b18;
+  --oda-rose:#91415a;
+}
+
+body{background:var(--oda-cream);color:var(--oda-charcoal)}
+.header,.nav{background:rgba(255,245,225,.97)}
+.header{border-bottom-color:#eadbc6}
+.topbar{background:var(--oda-bordeaux-deep)}
+.logoMark,.nav a:hover,.nav .active,.shelfHead>a,.shopHero span,.filterHead button,.actions>a,.sectionKicker{color:var(--oda-bordeaux)}
+.hero{background:linear-gradient(125deg,var(--oda-cream) 0%,var(--oda-cream-soft) 52%,#d9c8bf 100%)}
+.heroBtn,.priceRow button,.adminTop>button,.adminPrimary,.adminForm>button{background:var(--oda-bordeaux)}
+.discount{background:var(--oda-bordeaux)}
+.dropdownPanel{background:var(--oda-bordeaux-deep)}
+.dropdownPanel a:hover{color:var(--oda-cream)!important}
+.shopSearchLive,.searchBox,.wineCard,.filters select,.shopToolbar select{background:#fffaf0}
+.grapeCard{background:linear-gradient(145deg,var(--oda-olive),var(--oda-olive-soft));color:var(--oda-cream)}
+.grapeCard span,.grapeCard small{color:#e9e4bf}
+.newsletter{background:var(--oda-bordeaux)}
+.siteFooter,footer{background:var(--oda-charcoal)}
+.whatsapp{background:#25D366}
+
+.dragRail{overflow-x:auto;cursor:grab;user-select:none;touch-action:pan-y;scrollbar-width:none}
+.dragRail::-webkit-scrollbar{display:none}
+.dragRail.dragging{cursor:grabbing;scroll-behavior:auto}
+.grapeRail{display:flex;gap:14px;padding:4px 2px 14px}
+.grapeRail .grapeCard{flex:0 0 230px}
+
+.cartLoading{min-height:100vh;display:grid;place-items:center;background:var(--oda-cream)}
+.cartLoading div{text-align:center}
+.cartLoading span{font-size:10px;letter-spacing:.18em;color:var(--oda-bordeaux)}
+.cartLoading h1{font-family:var(--font-serif);font-size:36px}
+.cartThumb img{width:100%;height:100%;object-fit:cover}
+.cartNotice{margin:18px 0;background:#fff1ef;border:1px solid #efd6d0;color:#78313f;border-radius:10px;padding:12px 14px;font-size:12px}
+.emptyBag{width:56px;height:56px;border:2px solid #cbb8aa;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;color:#9a877b}
+.summaryKicker{font-size:9px;letter-spacing:.16em;color:var(--oda-bordeaux);font-weight:800}
+.cartSummary>a{display:block;text-align:center;margin-top:13px;font-size:11px;color:var(--oda-bordeaux);font-weight:700}
+
+@media(max-width:560px){
+  .grapeRail .grapeCard{flex-basis:78vw}
+}
