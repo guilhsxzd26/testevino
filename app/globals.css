@@ -29,3 +29,51 @@ footer{background:#201b18}
 .grapeCard small{color:#eadbd1;margin-top:4px}
 .grapeCard b{font-size:10px;margin-top:auto;letter-spacing:.08em}
 @media(max-width:560px){.shopSearchWrap{padding:0 16px}.shopSearchLive{grid-template-columns:20px 1fr}.shopSearchLive span{display:none}.grapeCard{min-width:78vw}}
+
+/* ODA-inspired navigation & refined footer */
+.header{background:#fffaf3}
+.headerTop{padding-top:16px;padding-bottom:16px}
+.nav{position:relative;background:#fffaf3}
+.navDrop{position:relative;height:100%;display:flex;align-items:center}
+.navDrop>a{height:100%;display:flex;align-items:center}
+.dropdownPanel{position:absolute;top:100%;left:50%;transform:translate(-50%,12px);min-width:260px;background:#5b1d2a;color:#fff7ec;border-radius:0 0 16px 16px;padding:18px 20px;box-shadow:0 18px 45px rgba(62,17,28,.2);opacity:0;visibility:hidden;pointer-events:none;transition:.2s ease;z-index:80}
+.dropdownPanel.wide{min-width:360px}
+.navDrop:hover .dropdownPanel{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}
+.dropdownPanel>span{display:block;font-size:9px;letter-spacing:.18em;color:#d9b9bd;margin-bottom:12px}
+.dropdownPanel>div{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:4px 18px}
+.dropdownPanel a{color:#fff7ec!important;font-size:12px;font-weight:600;padding:8px 0}
+.dropdownPanel a:hover{color:#e7d6a8!important}
+
+.grapeSectionFinal{margin:65px 0 20px;padding:40px 0 10px;border-top:1px solid #e8ddd0}
+.sectionKicker{font-size:9px!important;letter-spacing:.18em;color:var(--oda-wine)!important;font-weight:800}
+.grapeSectionFinal .shelfHead h2{font-size:30px;letter-spacing:.02em}
+
+.siteFooter{background:linear-gradient(180deg,#241816,#1b1412);color:#fff5ea;padding:58px max(24px,calc((100vw - 1280px)/2)) 24px;display:grid;grid-template-columns:1.35fr .65fr .65fr 1fr;gap:48px}
+.siteFooter>div{display:block}
+.footerBrandBlock .footerLogo{display:flex;align-items:center;gap:8px}
+.footerBrandBlock .footerLogo b{font-family:var(--font-serif);font-size:30px;letter-spacing:.05em}
+.footerBrandBlock p{margin:10px 0 8px;color:#eadfd5}
+.footerBrandBlock small{display:block;max-width:300px;line-height:1.6;color:#9f8f84}
+.footerCol{display:flex!important;flex-direction:column;gap:11px}
+.footerCol>b{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#e7d6a8;margin-bottom:4px}
+.footerCol>a{color:#d7c7bc;font-size:12px;transition:.2s}
+.footerCol>a:hover{color:#fff}
+.socialCol a{display:flex;align-items:center;gap:9px}
+.socialIcon{width:25px;height:25px;border:1px solid #705f57;border-radius:50%;display:grid;place-items:center}
+.socialIcon svg{width:14px;height:14px}
+.socialIcon.wa{color:#25D366}
+.footerBottom{grid-column:1/-1!important;border-top:1px solid #3a2c28;margin-top:16px;padding-top:20px;display:flex!important;justify-content:space-between;color:#82746d;font-size:10px}
+
+@media(max-width:900px){
+  .navDrop{width:100%;display:block;height:auto}
+  .navDrop>a{height:auto}
+  .dropdownPanel{display:none!important}
+  .siteFooter{grid-template-columns:1fr 1fr}
+  .footerBrandBlock{grid-column:1/-1}
+}
+@media(max-width:560px){
+  .siteFooter{grid-template-columns:1fr}
+  .footerBrandBlock,.footerBottom{grid-column:1!important}
+  .footerBottom{flex-direction:column;gap:6px}
+  .grapeSectionFinal .shelfHead h2{font-size:25px}
+}
