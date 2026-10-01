@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";\nimport ProductRail from "@/components/ProductRail";\nimport CartButton from "@/components/CartButton";
+import { useMemo, useState } from "react";
+import ProductRail from "@/components/ProductRail";
+import CartButton from "@/components/CartButton";
 
 const wines = [
   {name:"Gran Reserva Malbec", winery:"Bodega Altura", year:"2022", rating:"4,4", reviews:"1.280", old:"R$ 229,90", price:"R$ 189,90", discount:"-17%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=85"},
