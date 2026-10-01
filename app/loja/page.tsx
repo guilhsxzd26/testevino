@@ -30,6 +30,7 @@ export default function Loja(){
   },[]);
   const [country,setCountry]=useState("Todos");
   const [grape,setGrape]=useState("Todas");
+  const [winery,setWinery]=useState("Todas");
   const [sort,setSort]=useState("relevancia");
 
   const filtered = useMemo(()=>{
@@ -38,12 +39,13 @@ export default function Loja(){
       return (!query || q.includes(query.toLowerCase())) &&
         (type==="Todos" || w.type===type) &&
         (country==="Todos" || w.country===country) &&
-        (grape==="Todas" || w.grape===grape);
+        (grape==="Todas" || w.grape===grape) &&
+        (winery==="Todas" || w.winery===winery);
     });
     if(sort==="avaliacao") result=[...result].sort((a,b)=>Number(b.rating.replace(",","."))-Number(a.rating.replace(",",".")));
     if(sort==="menor") result=[...result].sort((a,b)=>Number(a.price.replace(/[^d,]/g,"").replace(",","."))-Number(b.price.replace(/[^d,]/g,"").replace(",",".")));
     return result;
-  },[query,type,country,grape,sort]);
+  },[query,type,country,grape,winery,sort]);
 
   const add=(w:(typeof wines)[number])=>addToCart({id:`${w.winery}-${w.name}-${w.year}`,name:`${w.name} ${w.year}`,winery:w.winery,year:w.year,price:money(w.price),image:w.image});
 
@@ -63,12 +65,13 @@ export default function Loja(){
       <strong>{filtered.length} rótulos</strong>
     </section>
 
+    <div className="shopSearchWrap"><div className="shopSearchLive"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar vinhos, bodegas, uvas ou regiões"/><span>{query ? `${filtered.length} resultado(s)` : "Busca em tempo real"}</span></div></div>
     <section className="shopLayout">
       <aside className="filters">
-        <div className="filterHead"><b>Filtros</b><button onClick={()=>{setType("Todos");setCountry("Todos");setGrape("Todas");setQuery("")}}>Limpar</button></div>
+        <div className="filterHead"><b>Filtros</b><button onClick={()=>{setType("Todos");setCountry("Todos");setGrape("Todas");setWinery("Todas");setQuery("")}}>Limpar</button></div>
         <label>Tipo de vinho<select value={type} onChange={e=>setType(e.target.value)}><option>Todos</option><option>Tinto</option><option>Branco</option><option>Rosé</option><option>Espumante</option></select></label>
         <label>País<select value={country} onChange={e=>setCountry(e.target.value)}><option>Todos</option><option>Argentina</option><option>Chile</option><option>França</option><option>Brasil</option></select></label>
-        <label>Uva<select value={grape} onChange={e=>setGrape(e.target.value)}><option>Todas</option><option>Malbec</option><option>Cabernet Sauvignon</option><option>Sauvignon Blanc</option><option>Pinot Noir</option><option>Grenache</option><option>Chardonnay</option><option>Syrah</option></select></label>
+        <label>Uva<select value={grape} onChange={e=>setGrape(e.target.value)}><option>Todas</option><option>Malbec</option><option>Cabernet Sauvignon</option><option>Cabernet Franc</option><option>Sauvignon Blanc</option><option>Pinot Noir</option><option>Grenache</option><option>Chardonnay</option><option>Syrah</option></select></label><label>Bodega<select value={winery} onChange={e=>setWinery(e.target.value)}><option>Todas</option>{[...new Set(wines.map(w=>w.winery))].map(x=><option key={x}>{x}</option>)}</select></label>
       </aside>
 
       <div className="shopMain">
