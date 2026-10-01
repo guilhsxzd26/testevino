@@ -18,7 +18,7 @@ function Card({wine}:{wine:RailWine}){
     addToCart({id,name:`${wine.name} ${wine.year||""}`.trim(),winery:wine.winery,year:wine.year,price:money(wine.price),image:wine.image});
     setAdded(true); setTimeout(()=>setAdded(false),900);
   };
-  return <article className="wineCard">
+  return <article className="wineCard">\n    <a className="productLink" href={wine.id?`/produto/${wine.id}`:"#"} draggable={false}>
     <div className="winePhoto">
       <Image src={wine.image} alt={wine.name} fill sizes="260px"/>
       <span className="discount">{wine.discount}</span>
@@ -38,7 +38,7 @@ export default function ProductRail({items}:{items:RailWine[]}){
   const base=useMemo(()=>items.slice(0,15),[items]);
   const looped=useMemo(()=>[...base,...base,...base],[base]);
   const ref=useRef<HTMLDivElement>(null);
-  const drag=useRef({down:false,x:0,left:0});
+  const drag=useRef({down:false,x:0,left:0,moved:false});
 
   useEffect(()=>{
     const el=ref.current;if(!el||!base.length)return;
@@ -53,19 +53,19 @@ export default function ProductRail({items}:{items:RailWine[]}){
   };
   const down=(e:React.PointerEvent<HTMLDivElement>)=>{
     const el=ref.current;if(!el)return;
-    drag.current={down:true,x:e.clientX,left:el.scrollLeft};
+    drag.current={down:true,x:e.clientX,left:el.scrollLeft,moved:false};
     el.setPointerCapture(e.pointerId); el.classList.add("dragging");
   };
   const move=(e:React.PointerEvent<HTMLDivElement>)=>{
     if(!drag.current.down||!ref.current)return;
-    ref.current.scrollLeft=drag.current.left-(e.clientX-drag.current.x);
+    const dx=e.clientX-drag.current.x; if(Math.abs(dx)>4)drag.current.moved=true; ref.current.scrollLeft=drag.current.left-dx;
   };
   const up=(e:React.PointerEvent<HTMLDivElement>)=>{
     drag.current.down=false; ref.current?.classList.remove("dragging");
     try{ref.current?.releasePointerCapture(e.pointerId)}catch{}
   };
   if(!base.length)return null;
-  return <div ref={ref} className="wineRail infiniteRail" onScroll={onScroll} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+  return <div ref={ref} className="wineRail infiniteRail" onScroll={onScroll} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onDragStart={e=>e.preventDefault()} onClickCapture={e=>{if(drag.current.moved){e.preventDefault();e.stopPropagation();drag.current.moved=false}}}>
     {looped.map((w,i)=><Card key={`${w.name}-${i}`} wine={w}/>)}
   </div>
 }
