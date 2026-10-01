@@ -33,7 +33,7 @@ export default function DraggableRail({children,className=""}:{children:ReactNod
     onPointerDown={onDown}
     onPointerMove={onMove}
     onPointerUp={onUp}
-    onPointerCancel={onUp}
+    onPointerCancel={onUp}\n    onDragStart={e=>e.preventDefault()}
     onClickCapture={onClickCapture}
   >{children}</div>
 }
