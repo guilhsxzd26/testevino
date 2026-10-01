@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ProductRail, { RailWine } from "@/components/ProductRail";
 import { supabase } from "@/lib/supabase";
+import DraggableRail from "@/components/DraggableRail";
 
 type Section={
   id:string;
@@ -120,13 +121,13 @@ export default function DynamicHomeSections(){
               {section.body&&<p>{section.body}</p>}
             </div>
           </div>
-          <div className="grapeRail">
+          <DraggableRail className="grapeRail">
             {[...grapes,...grapes].map((g,i)=>
               <a href={"/loja?uva="+encodeURIComponent(g.name)} className="grapeCard" key={g.id+"-"+i}>
                 <span>UVA</span><strong>{g.name}</strong><small>{g.description||"Explore os rótulos dessa variedade."}</small><b>VER VINHOS →</b>
               </a>
             )}
-          </div>
+          </DraggableRail>
         </section>
       }
 
