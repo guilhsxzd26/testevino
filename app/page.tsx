@@ -39,6 +39,10 @@ function Icon({name}:{name:"search"|"bag"|"user"|"heart"|"menu"|"chev"}) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">{p[name]}</svg>;
 }
 
+
+function InstagramIcon(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>}
+function SocialWhatsappIcon(){return <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.02 5.2A10.7 10.7 0 0 0 6.8 21.34L5.2 26.8l5.6-1.48a10.72 10.72 0 1 0 5.22-20.12Zm0 19.5a8.73 8.73 0 0 1-4.46-1.22l-.32-.19-3.32.88.89-3.23-.2-.33A8.75 8.75 0 1 1 16.02 24.7Zm4.8-6.55c-.26-.13-1.56-.77-1.8-.86-.24-.09-.41-.13-.59.13-.17.26-.67.86-.82 1.04-.15.17-.3.2-.56.07-.26-.13-1.1-.41-2.1-1.3-.77-.69-1.3-1.54-1.45-1.8-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.33-.02-.46-.07-.13-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45h-.5c-.17 0-.46.07-.7.33-.24.26-.91.89-.91 2.17s.93 2.52 1.06 2.7c.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.56-.64 1.78-1.26.22-.62.22-1.15.15-1.26-.06-.11-.24-.17-.5-.3Z"/></svg>}
+
 function WhatsappIcon(){
   return <svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
     <path d="M16.02 5.2A10.7 10.7 0 0 0 6.8 21.34L5.2 26.8l5.6-1.48a10.72 10.72 0 1 0 5.22-20.12Zm0 19.5a8.73 8.73 0 0 1-4.46-1.22l-.32-.19-3.32.88.89-3.23-.2-.33A8.75 8.75 0 1 1 16.02 24.7Zm4.8-6.55c-.26-.13-1.56-.77-1.8-.86-.24-.09-.41-.13-.59.13-.17.26-.67.86-.82 1.04-.15.17-.3.2-.56.07-.26-.13-1.1-.41-2.1-1.3-.77-.69-1.3-1.54-1.45-1.8-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.33-.02-.46-.07-.13-.59-1.42-.81-1.95-.21-.51-.43-.44-.59-.45h-.5c-.17 0-.46.07-.7.33-.24.26-.91.89-.91 2.17s.93 2.52 1.06 2.7c.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.56-.64 1.78-1.26.22-.62.22-1.15.15-1.26-.06-.11-.24-.17-.5-.3Z"/>
@@ -78,7 +82,11 @@ export default function Home(){
         <div className="actions"><button><Icon name="user"/></button><CartButton/></div>
       </div>
       <nav className={menu?"nav open":"nav"}>
-        <a href="/loja">Loja</a><a href="#vinhos">Vinhos</a><a href="#bodegas">Bodegas</a><a href="#uvas">Uvas</a><a href="#ofertas">Ofertas</a>
+        <a href="/loja">Loja</a>
+        <div className="navDrop"><a href="/loja">Vinhos</a><div className="dropdownPanel"><span>TIPOS DE VINHO</span><div>{categories.map(c=><a key={c} href={`/loja?tipo=${encodeURIComponent(c)}`}>{c}</a>)}</div></div></div>
+        <div className="navDrop"><a href="/loja">Bodegas</a><div className="dropdownPanel wide"><span>BODEGAS</span><div>{["Bodega Altura","Viña del Sur","Casa Costera","Maison Éloise","Casa del Valle","Serra Alta","Valle Claro"].map(b=><a key={b} href={`/loja?bodega=${encodeURIComponent(b)}`}>{b}</a>)}</div></div></div>
+        <div className="navDrop"><a href="#uvas">Uvas</a><div className="dropdownPanel wide"><span>UVAS</span><div>{grapes.map(g=><a key={g.name} href={`/loja?uva=${encodeURIComponent(g.name)}`}>{g.name}</a>)}</div></div></div>
+        <a href="#ofertas">Ofertas</a>
       </nav>
     </header>
 
@@ -118,11 +126,6 @@ export default function Home(){
         <ProductRail items={wines.filter(w=>w.name.toLowerCase().includes("cabernet franc"))}/>
       </section>
 
-      <section className="grapeSection" id="uvas">
-        <div className="shelfHead"><div><h2>Explore por uva</h2><p>Arraste para conhecer as principais uvas do catálogo.</p></div></div>
-        <div className="grapeRail">{[...grapes,...grapes].map((g,i)=><a href={`/loja?uva=${encodeURIComponent(g.name)}`} className="grapeCard" key={g.name+i}><span>UVA</span><strong>{g.name}</strong><small>{g.desc}</small><b>Explorar →</b></a>)}</div>
-      </section>
-
       <section className="benefitGrid">
         <div><b>Curadoria especializada</b><span>Rótulos escolhidos com critério.</span></div>
         <div><b>Compra simples</b><span>Escolha, adicione e finalize pelo atendimento.</span></div>
@@ -134,14 +137,9 @@ export default function Home(){
         <ProductRail items={wines.slice().reverse()}/>
       </section>
 
-      <section className="styles">
-        <h2>Explore por estilo</h2>
-        <div className="styleCards">
-          <a href="/loja?tipo=Tinto"><strong>Tintos encorpados</strong><span>Cabernet · Malbec · Syrah</span></a>
-          <a href="/loja?tipo=Branco"><strong>Brancos frescos</strong><span>Sauvignon · Chardonnay</span></a>
-          <a href="/loja?tipo=Rosé"><strong>Rosés leves</strong><span>Provence · Grenache</span></a>
-          <a href="/loja?tipo=Espumante"><strong>Espumantes</strong><span>Brut · Extra Brut</span></a>
-        </div>
+      <section className="grapeSection grapeSectionFinal" id="uvas">
+        <div className="shelfHead"><div><p className="sectionKicker">DESCUBRA PELO PERFIL</p><h2>EXPLORE POR UVAS</h2><p>Arraste para navegar. Ao escolher uma uva, a loja já abre filtrada.</p></div></div>
+        <div className="grapeRail">{[...grapes,...grapes].map((g,i)=><a href={`/loja?uva=${encodeURIComponent(g.name)}`} className="grapeCard" key={g.name+i}><span>UVA</span><strong>{g.name}</strong><small>{g.desc}</small><b>VER VINHOS →</b></a>)}</div>
       </section>
 
       <section className="newsletter">
@@ -150,11 +148,12 @@ export default function Home(){
       </section>
     </section>
 
-    <footer>
-      <div className="footerLogo"><span className="logoMark">V</span><b>VIDEIRA</b><p>Vinhos & curadoria</p></div>
-      <div><b>Comprar</b><a href="/loja">Vinhos</a><a href="/loja">Ofertas</a><a href="/loja">Bodegas</a></div>
-      <div><b>Redes sociais</b><a href="https://instagram.com/videiravinhoteca" target="_blank">@videiravinhoteca</a><a href="https://wa.me/5545999056277" target="_blank">WhatsApp · 45 99905-6277</a><a href="#">Entrega</a></div>
-      <small>© 2026 Videira · Venda proibida para menores de 18 anos.</small>
+    <footer className="siteFooter">
+      <div className="footerBrandBlock"><div className="footerLogo"><span className="logoMark">V</span><b>VIDEIRA</b></div><p>Vinhos & curadoria</p><small>Uma seleção pensada para descobrir, comparar e escolher melhor.</small></div>
+      <div className="footerCol"><b>Menu</b><a href="/">Início</a><a href="/loja">Loja</a><a href="/#ofertas">Ofertas</a><a href="/#uvas">Uvas</a></div>
+      <div className="footerCol"><b>Catálogo</b><a href="/loja?tipo=Tinto">Tintos</a><a href="/loja?tipo=Branco">Brancos</a><a href="/loja?tipo=Rosé">Rosés</a><a href="/loja?tipo=Espumante">Espumantes</a></div>
+      <div className="footerCol socialCol"><b>Redes sociais</b><a href="https://instagram.com/videiravinhoteca" target="_blank"><span className="socialIcon"><InstagramIcon/></span><span>@videiravinhoteca</span></a><a href="https://wa.me/5545999056277" target="_blank"><span className="socialIcon wa"><SocialWhatsappIcon/></span><span>45 99905-6277</span></a></div>
+      <div className="footerBottom"><span>© 2026 Videira Vinhoteca</span><span>Venda proibida para menores de 18 anos.</span></div>
     </footer>
     <a className="whatsapp" href="https://wa.me/5545999056277" target="_blank" aria-label="WhatsApp"><WhatsappIcon/></a>
   </main>
