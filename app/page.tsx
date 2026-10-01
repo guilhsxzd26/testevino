@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import ProductRail from "@/components/ProductRail";
 import CartButton from "@/components/CartButton";
+import DynamicHomeSections from "@/components/DynamicHomeSections";
 
 const wines = [
   {name:"Gran Reserva Malbec", winery:"Bodega Altura", year:"2022", rating:"4,4", reviews:"1.280", old:"R$ 229,90", price:"R$ 189,90", discount:"-17%", country:"Argentina", type:"Tinto", image:"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=85"},
@@ -106,46 +107,8 @@ export default function Home(){
       <h2>Compre vinhos bem avaliados</h2>
       <div className="categoryRow">{categories.map(c=><a href={`/loja?tipo=${encodeURIComponent(c)}`} key={c}>{c}</a>)}</div>
 
-      <section className="shelf" id="ofertas">
-        <div className="shelfHead"><div><h2>Ofertas para você</h2><p>Ótimo custo-benefício em rótulos selecionados.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
-        <ProductRail items={query?filtered:wines}/>
-      </section>
+      <DynamicHomeSections/>
 
-      <section className="shelf">
-        <div className="shelfHead"><div><h2>Novidades</h2><p>Rótulos que acabaram de chegar à Videira.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
-        <ProductRail items={wines.slice().reverse()}/>
-      </section>
-
-      <section className="shelf">
-        <div className="shelfHead"><div><h2>Malbec</h2><p>Seleção de Malbecs para descobrir.</p></div><a href="/loja?uva=Malbec">Ver tudo <Icon name="chev"/></a></div>
-        <ProductRail items={wines.filter(w=>w.name.toLowerCase().includes("malbec"))}/>
-      </section>
-
-      <section className="shelf">
-        <div className="shelfHead"><div><h2>Cabernet Franc</h2><p>Elegância e frescor em uma das uvas mais queridas.</p></div><a href="/loja?uva=Cabernet%20Franc">Ver tudo <Icon name="chev"/></a></div>
-        <ProductRail items={wines.filter(w=>w.name.toLowerCase().includes("cabernet franc"))}/>
-      </section>
-
-      <section className="benefitGrid">
-        <div><b>Curadoria especializada</b><span>Rótulos escolhidos com critério.</span></div>
-        <div><b>Compra simples</b><span>Escolha, adicione e finalize pelo atendimento.</span></div>
-        <div><b>Atendimento humano</b><span>Ajuda para encontrar o vinho ideal.</span></div>
-      </section>
-
-      <section className="shelf" id="vinhos">
-        <div className="shelfHead"><div><h2>Mais procurados</h2><p>Os rótulos que estão chamando mais atenção.</p></div><a href="/loja">Ver tudo <Icon name="chev"/></a></div>
-        <ProductRail items={wines.slice().reverse()}/>
-      </section>
-
-      <section className="grapeSection grapeSectionFinal" id="uvas">
-        <div className="shelfHead"><div><p className="sectionKicker">DESCUBRA PELO PERFIL</p><h2>EXPLORE POR UVAS</h2><p>Arraste para navegar. Ao escolher uma uva, a loja já abre filtrada.</p></div></div>
-        <div className="grapeRail">{[...grapes,...grapes].map((g,i)=><a href={`/loja?uva=${encodeURIComponent(g.name)}`} className="grapeCard" key={g.name+i}><span>UVA</span><strong>{g.name}</strong><small>{g.desc}</small><b>VER VINHOS →</b></a>)}</div>
-      </section>
-
-      <section className="newsletter">
-        <div><span>VIDEIRA</span><h2>Descubra novos rótulos.</h2><p>Receba novidades, seleções e ofertas especiais.</p></div>
-        <div><input placeholder="Seu melhor e-mail"/><button>Quero receber</button></div>
-      </section>
     </section>
 
     <footer className="siteFooter">
